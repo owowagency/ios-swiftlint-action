@@ -1,0 +1,16 @@
+name: 'SwiftLint'
+description: 'OWOW iOS SwiftLint action'
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v2
+    - name: Mint bootstrap
+      run: |
+        # This first step makes sure only one instance of mint is running at the same time.
+        # If more than one instance is running, it will wait until it is finished before proceeding.
+        arch -arm64 lsof -p $(pgrep mint) +r 1 &>/dev/null || true
+        
+        # The mint bootstrap step makes sure we use the swiftlint version that is declared in the project.
+        arch -arm64 mint bootstrap
+    - name: lint
+      run: arch -arm64 mint run swiftlint --reporter github-actions-logging --strict
